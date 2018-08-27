@@ -1,6 +1,6 @@
 # Yellow
 
-Aplicación para extración de datos desde [amarillas](https://amarillas.cl) 
+Aplicación para extración de datos desde [amarillas](https://amarillas.cl) con puppeter y nodejs 
 
 ## Instalación
 
