@@ -2,19 +2,12 @@
   "name": "yellow-scrapper",
   "version": "0.0.1",
   "description": "Scrape amarillas.",
-  "main": "servidor.js",
+  "main": "yellow.js",
   "author": "Eddybag",
   "dependencies": {
     "alasql": "^0.3.5",
-    "casperjs": "^1.1.4",
-    "cheerio": "latest",
-    "express": "latest",
     "http": "0.0.0",
-    "nightmare": "^2.9.0",
-    "phantomjs": "^2.1.7",
-    "puppeteer": "^1.7.0",
-    "request": "latest",
-    "vo": "^4.0.2"
+    "puppeteer": "^1.7.0"
   },
   "devDependencies": {}
 }
