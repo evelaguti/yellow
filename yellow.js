@@ -131,13 +131,13 @@ async function scrape(buscar) {
     }
   } while (next !== null);
   // exportar los clientes a excel ♥️
-  await exporta_excel(buscar, clientesTotales);
+  await exportExcel(buscar, clientesTotales);
 
   await browser.close();
 }
 
 // exportar arreglo de clientes a xlsx
-async function exporta_excel(buscar, clientes) {
+async function exportExcel(buscar, clientes) {
   console.log("\n Archivo exportado exitosamente 👏");
   alasql('SELECT * INTO XLSX("out/' + buscar + '.xlsx",{headers:true})FROM ?', [
     clientes
@@ -194,4 +194,8 @@ async function verificarRespuesta(page) {
 }
 
 let args = process.argv.slice(2);
-scrape(args);
+scrape(args).catch(e => {
+  console.log('Un error a ocurrido 😰 \n'+e )
+  process.exit()
+})
+
