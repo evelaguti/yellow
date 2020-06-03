@@ -41,7 +41,7 @@ async function scrape(buscar) {
   }
 
   // El selector de los avisos
-  let sel = "li.business";
+  let sel = ".business";
 
   await page.waitForSelector(sel);
   let clientesTotales = [];
@@ -64,6 +64,7 @@ async function scrape(buscar) {
         Array.from(el.children).map(e => {
           // Extraer el link del sitio.
           if (e.querySelector("#Web") !== null) {
+            console.log('Encontré web')
             web = e.querySelector("#Web").href;
           }
           // Extraer datos en tag script.
@@ -182,15 +183,15 @@ async function verificarAmarillas() {
 
 async function verificarRespuesta(page) {
   // clase flag de resultados 
-  let selBe = '.be'
-  let sel = ".no-results-left";
+  let selBe = '.business'
+  let sel = ".business";
   await page.waitForSelector(selBe);
   let result = await page.evaluate(sel => {
      return document.querySelector(sel) === null ?
       document.querySelector(sel) 
       :  document.querySelector(sel).className
   },sel);
-  return result === null ? true : false;
+  return result === null ? false : true;
 }
 
 let args = process.argv.slice(2);
