@@ -1,4 +1,6 @@
+package-lock.json
+node_modules/
 out/
 screenshots/
-node_modules/
+.vscode
 .DS_Store

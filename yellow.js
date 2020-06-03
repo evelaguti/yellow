@@ -44,71 +44,36 @@ async function scrape(buscar) {
   let sel = ".business";
 
   await page.waitForSelector(sel);
-  let clientesTotales = [];
+  
+  
   let next;
   let pagina = 1;
+  let clientesTotales = []
   // variables responsables de animación de carga
   let P = ["\\", "|", "/", "-"];
   let pindex = 0;
 
   do {
+    
     // esperar a que sean visibles los li
     await page.waitForSelector(sel);
     // Tomar una captura de la última extracion
     await page.screenshot({ path: "screenshots/yellow.png", fullPage: true });
-    let clientes = await page.evaluate(sel => {
-      const links = Array.from(document.querySelectorAll(sel)).map(el => {
-        let email = "No publica email";
-        let data;
-        let web = "No publica sitio web";
-        Array.from(el.children).map(e => {
-          // Extraer el link del sitio.
-          if (e.querySelector("#Web") !== null) {
-            console.log('Encontré web')
-            web = e.querySelector("#Web").href;
-          }
-          // Extraer datos en tag script.
-          if (e.tagName === "SCRIPT") {
-            data = e.innerText;
-          }
-          // Extraer email de clase questionData.
-          if (e.className === "questionData") {
-            email = e.value;
-          }
-        });
-        return { email: email, data: data, web: web };
-      });
-      return links;
-    }, sel);
-
-    clientes = clientes
-      .filter(el => {
-        return el.data !== undefined;
+    
+   let resultado = await page.evaluate(()=>{
+      let clientes = [];
+      let avisos = document.querySelectorAll('meta[itemprop=name]');
+      avisos.forEach(function(aviso){
+        let cliente = {}
+        cliente.nombre = aviso.content;
+        cliente.email = aviso.nextElementSibling.outerHTML.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi);
+        cliente.fono = aviso.parentElement.outerHTML.match(/\(\+\d{2,4}\) \d \d{2,8} \d{2,8}/gi);
+        let website = aviso.parentElement.querySelector('#Web');
+        cliente.web = website != null ? website.href : '';
+        clientes.push(cliente);
       })
-      .map(el => {
-        let str_json = el.data;
-        str_json = str_json.substring(str_json.indexOf("["));
-        str_json = str_json
-          .replace(/'/gi, '"')
-          .replace(/\\/gi, "\\")
-          .replace(/":"/gi, '""')
-          .replace(/:/gi, "")
-          .replace(/;/gi, "")
-          .trim();
-        let data = JSON.parse(str_json);
-        return {
-          empresa: data[0],
-          direccion: data[11] + " " + data[2],
-          telefono: data[5],
-          categoria: data[6],
-          direccion_amarillas: data[7],
-          id_amarillas: data[8],
-          email: el.email,
-          web: el.web
-        };
-      });
-
-    clientesTotales.push.apply(clientesTotales, clientes);
+      return clientes;
+    });
 
     process.stdout.write(
       "\r Datos extraídos " +
@@ -119,6 +84,7 @@ async function scrape(buscar) {
         P[pindex++]
     );
     pindex = pindex % P.length;
+    Array.prototype.push.apply(clientesTotales,resultado)
 
     let nextLink = "li.last";
     next = await page.evaluate(nextLink => {
@@ -131,6 +97,7 @@ async function scrape(buscar) {
       pagina++;
     }
   } while (next !== null);
+  //} while (resultado === null);
   // exportar los clientes a excel ♥️
   await exportExcel(buscar, clientesTotales);
 
@@ -194,6 +161,7 @@ async function verificarRespuesta(page) {
   return result === null ? false : true;
 }
 
+// Ejecutar el programa con los argumentos de la linea de comandos
 let args = process.argv.slice(2);
 scrape(args).catch(e => {
   console.log('Un error a ocurrido 😰 \n'+e )
